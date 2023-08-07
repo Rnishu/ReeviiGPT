@@ -1,24 +1,72 @@
 //Class "Node" has value, operation, children(operands), and gradient
 import JTorch.*;
 public class App{
-    public static void main(String[] args){
-        Node unitNode=new Node(1);
-        Node loss=new Node(0);
-        Node[][] orQuestions={{new Node(1), new Node(0)},{new Node(0),new Node(1)},{new Node(0),new Node(0)}};
-        Layer n1=new Layer(2,2);
-        for(int i=0;i<100 ;i++){
-        Node[] out1=n1.forward(orQuestions[i%3]);
-        loss=unitNode.sub(out1[(~((int)orQuestions[i%3][0].value&(int)orQuestions[i%3][1].value))&((int)orQuestions[i%3][0].value|(int)orQuestions[i%3][1].value)]);
-        loss.backward();
-        Node[] parameters=n1.parameters();
-        for(int j=0;j<parameters.length;j++){
-            parameters[j]=new Node(parameters[j].value-(0.1*parameters[j].grad), parameters[j].op, parameters[j].childrNodes);
-            parameters[j].grad=0;
+    static int ctoi(char c,char[] arr){
+        int out=-1;
+        for(int i=0;i<58;i++){
+            if(arr[i]==c){out=i; break;}
         }
+        return out;
     }
-        Node[] in={new Node( 1),new Node(01)};
-        Node[] out2=n1.forward(in);
-        System.out.println("loss is:"+loss.value+"\nProbability of a zero:"+out2[0].value+"\nProbability of a one:"+out2[1].value);
+    static int choose(Node[] probs){
+        double x=Math.random();
+        int out=-1;
+        for(int i=0;i<probs.length;i++){
+            if(x<probs[i].value){
+                out=i;
+                break;
+            }
+            else x-=probs[i].value;
+        }
+        return out;
+    }
+    public static void main(String[] args){
+        String inp="hi guys";
+        int[] len={8,94,94,58};
+        MLP reevaa=new MLP(len);
+        char[] lookup=new char[58];
+        for(char i='A';i<='Z';i++){
+            lookup[i-65]=i;
+        }
+        for(char i='a';i<='z';i++){
+            lookup[i-97+26]=i;
+        }
+        lookup[52]=' ';
+        lookup[53]='!';
+        lookup[54]='(';
+        lookup[55]=')';
+        lookup[56]='.';
+        lookup[57]=',';
+        Node[] input=new Node[8];
+        Node[] para=reevaa.parameters();
+        int answer;
+        for(int i=0;i<1000;i++){
+           
+            int ran=(int)Math.random()*(inp.length()-8);
+            for(int s=ran;s<ran+8;s++){
+                input[s-ran]=new Node(ctoi(inp.charAt(s),lookup));
+            }
+            answer=ctoi(inp.charAt(ran+8),lookup);
+            Node[] o=reevaa.forward(input, 'a');
+            Node loss=Node.nll(Node.softmax(o),answer);
+            loss.backward();
+            for(Node p:para){
+                p.value-=(0.01*p.grad);
+                p.grad=0;
+            }
+        }
+        String query="are you?";
+        Node[] question=new Node[8];
+        for(int s=0;s<8;s++){
+                question[s]=new Node(ctoi(query.charAt(s),lookup));
+            }
+        Node[] probs=new Node[58];
+        for(int i=0;i<100;i++){
+            probs=Node.softmax((reevaa.forward(question,'a')));
+            char a=lookup[choose(probs)];
+            System.out.print(a);
+            query=query.substring(1).concat(Character.toString(a));
+        }
     }
 }
  
