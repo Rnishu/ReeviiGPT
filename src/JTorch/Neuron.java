@@ -14,19 +14,35 @@ public class Neuron{
     }
     //needed a way to create a node at every iteration so i created a array of nodes called sum which in its computation creates objects of the multiplication type anyway
     public Node forward(Node[] in){
-        Node[] sum=new Node[in.length-1];
+        /*Node[] sum=new Node[in.length-1];
         sum[0]=in[0].mul(this.weights[0]);
         for(int i=1;i<in.length-1;i++)
             sum[i]=sum[i-1].add(in[i].mul(this.weights[i]));
-        return ((sum[in.length-2].add(in[in.length-1].mul(this.weights[in.length-1]))).add(this.bias)) ;//sum[in.length-1];
+        return ((sum[in.length-2].add(in[in.length-1].mul(this.weights[in.length-1]))).add(this.bias))*/ ;//sum[in.length-1];
+        return (Node.dot(in,this.weights).add(this.bias));
         } 
     public Node forward(Node[] in, char a){
-        Node[] sum=new Node[in.length-1];
+        /*Node[] sum=new Node[in.length-1];
         sum[0]=in[0].mul(this.weights[0]);
         for(int i=1;i<in.length-1;i++)
             sum[i]=sum[i-1].add(in[i].mul(this.weights[i]));
-        return ((sum[in.length-2].add(in[in.length-1].mul(this.weights[in.length-1]))).add(this.bias)).relu() ;//sum[in.length-1];
-        }     
+        return ((sum[in.length-2].add(in[in.length-1].mul(this.weights[in.length-1]))).add(this.bias)).relu() ;*///sum[in.length-1];
+        return (Node.dot(in,this.weights).add(this.bias).relu());
+        }
+        public Node[] forward(Node[][] in){
+            Node[] out=new Node[in.length];
+            for(int i=0;i<out.length;i++){
+                out[i]=this.forward(in[i]);
+            }
+            return out;
+        }  
+        public Node[] forward(Node[][] in, char a){
+            Node[] out=new Node[in.length];
+            for(int i=0;i<out.length;i++){
+                out[i]=this.forward(in[i],a);
+            }
+            return out;
+        }  
     // Function to access all the parameters of a given layer
         Node[] parameters(){
         Node[] para=new Node[this.weights.length+1];

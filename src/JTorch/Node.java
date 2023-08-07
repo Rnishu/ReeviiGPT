@@ -49,6 +49,19 @@ public class Node {
             return new Node(0,'r',children);
         }
     } 
+    public static Node[] softmax(Node[] in){
+        double sum=0;
+        for(Node node:in)
+        sum+=Math.exp(node.value);
+        for(Node node:in){
+            node=new Node(Math.exp(node.value)/sum,'s',new Node[] {node});
+        }
+        return in;
+    }
+    public static Node nll(Node[] prob, int answer){
+        Node[] childrNodes={prob[answer]};
+        return new Node(-Math.log(prob[answer].value),'l',childrNodes);
+    }
     //only called on output, not recursive, sets gradient of output 1
     public void backward(){
         this.grad=1;
@@ -77,6 +90,12 @@ public class Node {
                 this.childrNodes[i].grad+=(this.childrNodes[i+this.childrNodes.length/2].value*this.grad);
                 this.childrNodes[i+this.childrNodes.length/2].grad+=(this.childrNodes[i].value*this.grad);
             }
+            break;
+            case 's':this.childrNodes[0].grad=this.value*(1-this.value);
+            this.childrNodes[0].backpass();
+            break;
+            case 'l':this.childrNodes[0].grad=-1/this.childrNodes[0].value;
+            this.childrNodes[0].backpass();
             break;
         }
     }
