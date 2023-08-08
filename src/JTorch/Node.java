@@ -51,12 +51,14 @@ public class Node {
     } 
     public static Node[] softmax(Node[] in){
         double sum=0;
-        for(Node node:in)
-        sum+=Math.exp(node.value);
+        Node[] out=new Node[in.length];
         for(Node node:in){
-            node=new Node(Math.exp(node.value)/sum,'s',new Node[] {node});
+        sum+=Math.exp(node.value);
         }
-        return in;
+        for(int i=0;i<in.length;i++){
+            out[i]=new Node(Math.exp(in[i].value)/sum,'s',new Node[] {in[i]});
+        }
+        return out;
     }
     public static Node nll(Node[] prob, int answer){
         Node[] childrNodes={prob[answer]};

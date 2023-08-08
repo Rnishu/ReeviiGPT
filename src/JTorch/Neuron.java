@@ -1,14 +1,16 @@
 package JTorch;
+import java.util.Random;
 //Class Neuron, each having weights and a bias, that input an array and output 1 number
 public class Neuron{
     //each neuron will have a array of weights and some bias to be added
     public Node[] weights;
     public Node bias;
+    Random rand=new Random();
     //each neuron is initialized to have nin weights
     public Neuron(int nin){
         this.weights=new Node[nin];
         for(int i=0;i<nin;i++){
-            this.weights[i]=new Node((Math.random()*2)-1);
+            this.weights[i]=new Node(rand.nextGaussian()*0.1);
         }
         this.bias=new Node(0);
     }
